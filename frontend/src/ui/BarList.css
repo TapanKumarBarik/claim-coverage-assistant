@@ -1,0 +1,6 @@
+.bar-list { list-style: none; padding: 0; margin: 0; display: grid; gap: 0.4rem; }
+.bar-list__item { display: grid; grid-template-columns: minmax(6rem, 40%) 1fr auto; gap: 0.6rem; align-items: center; font-size: 0.88rem; }
+.bar-list__label { overflow-wrap: anywhere; }
+.bar-list__track { height: 0.6rem; background: var(--surface-2); border-radius: 999px; overflow: hidden; }
+.bar-list__fill { display: block; height: 100%; background: var(--accent); border-radius: 999px; }
+.bar-list__value { font-variant-numeric: tabular-nums; font-weight: 600; min-width: 2ch; text-align: right; }

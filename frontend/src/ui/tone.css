@@ -1,0 +1,5 @@
+.tone--neutral { --tone-bg: var(--neutral-bg); --tone-fg: var(--neutral-fg); --tone-border: var(--neutral-border); }
+.tone--ok { --tone-bg: var(--ok-bg); --tone-fg: var(--ok-fg); --tone-border: var(--ok-border); }
+.tone--warning { --tone-bg: var(--warning-bg); --tone-fg: var(--warning-fg); --tone-border: var(--warning-border); }
+.tone--danger { --tone-bg: var(--danger-bg); --tone-fg: var(--danger-fg); --tone-border: var(--danger-border); }
+.tone--info { --tone-bg: var(--info-bg); --tone-fg: var(--info-fg); --tone-border: var(--info-border); }

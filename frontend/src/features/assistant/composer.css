@@ -1,0 +1,16 @@
+.composer { border: 1px solid var(--border); border-radius: 1.5rem; background: var(--surface); box-shadow: var(--shadow); padding: 0.75rem 0.75rem 0.6rem 1.1rem; }
+.composer:focus-within { outline: 2px solid var(--focus); outline-offset: 1px; }
+
+/* Specificity beats the shared `.control` look: the box has no border of its own, the composer draws it. */
+.composer .composer__input { display: block; width: 100%; min-height: 0; max-height: 12rem; padding: 0.2rem 0; border: 0; border-radius: 0; background: transparent; resize: none; overflow-y: auto; outline: none; }
+
+.composer__bar { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem; padding-top: 0.5rem; }
+.composer__option { display: inline-flex; align-items: center; gap: 0.4rem; min-width: 0; }
+.composer__option--grow { flex: 1 1 14rem; }
+.composer__caption { font-size: 0.8rem; color: var(--muted); white-space: nowrap; }
+.composer .composer__control { width: auto; min-width: 0; max-width: 100%; padding: 0.3rem 0.6rem; font-size: 0.85rem; border-radius: 999px; background: var(--surface-2); border-color: transparent; }
+.composer .composer__option--grow .composer__control { width: 100%; text-overflow: ellipsis; }
+
+.composer__send { flex: none; margin-left: auto; width: 2.25rem; height: 2.25rem; display: grid; place-items: center; border: 0; border-radius: 50%; background: var(--accent); color: var(--accent-fg); cursor: pointer; }
+.composer__send:hover:not(:disabled) { filter: brightness(1.1); }
+.composer__send:disabled { opacity: 0.3; cursor: not-allowed; }

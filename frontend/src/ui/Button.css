@@ -1,0 +1,13 @@
+.button { font: inherit; cursor: pointer; padding: 0.45rem 0.85rem; border-radius: 8px; border: 1px solid var(--border); background: var(--surface); color: var(--text); }
+.button:hover:not(:disabled) { background: var(--surface-2); }
+.button:disabled { opacity: 0.55; cursor: not-allowed; }
+.button--small { padding: 0.3rem 0.65rem; font-size: 0.82rem; }
+.button--primary { background: var(--accent); color: var(--accent-fg); border-color: var(--accent); font-weight: 600; padding: 0.6rem 1.25rem; }
+.button--primary:hover:not(:disabled) { filter: brightness(1.12); background: var(--accent); }
+.button--danger { background: var(--danger); border-color: var(--danger); color: var(--surface); }
+.button--danger:hover:not(:disabled) { background: var(--danger); filter: brightness(1.08); }
+.button--danger-outline { color: var(--danger); border-color: var(--danger); }
+.button--link { background: none; border: 0; padding: 0; color: var(--accent); text-decoration: underline; text-underline-offset: 2px; }
+.button--link:hover:not(:disabled) { background: none; }
+.button--chip { border-radius: 999px; font-size: 0.85rem; padding: 0.35rem 0.9rem; }
+.button--chip:hover:not(:disabled) { background: var(--accent-soft); color: var(--accent-soft-fg); border-color: transparent; }

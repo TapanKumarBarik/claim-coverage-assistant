@@ -1,0 +1,14 @@
+/* The like / dislike row at the end of an answer. */
+.feedback { margin-top: 1rem; padding-top: 0.7rem; border-top: 1px solid var(--border); }
+.feedback__row { display: flex; flex-wrap: wrap; align-items: center; gap: 0.4rem; }
+.feedback__prompt { margin-right: 0.35rem; font-size: 0.85rem; color: var(--muted); }
+.feedback__button { display: inline-grid; place-items: center; width: 2.15rem; height: 2.15rem; padding: 0; border: 1px solid var(--border); border-radius: 50%; background: var(--surface); color: var(--muted); cursor: pointer; }
+.feedback__button:hover { background: var(--accent-soft); color: var(--accent-soft-fg); border-color: transparent; }
+.feedback__button[aria-pressed="true"] svg { fill: currentColor; }
+.feedback__button[data-rating="up"][aria-pressed="true"] { background: var(--ok-bg); color: var(--ok-fg); border-color: var(--ok-fg); }
+.feedback__button[data-rating="down"][aria-pressed="true"] { background: var(--danger-bg); color: var(--danger-fg); border-color: var(--danger-fg); }
+.feedback__button[aria-busy="true"] { cursor: progress; }
+.feedback__message { font-size: 0.85rem; color: var(--muted); }
+.feedback__message--error { color: var(--danger); }
+.feedback__comment { max-width: 34rem; margin-top: 0.85rem; }
+.feedback__comment textarea.control { min-height: 4.5rem; }

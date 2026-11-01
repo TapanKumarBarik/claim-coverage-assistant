@@ -1,0 +1,57 @@
+name: deploy
+
+# Deploys to the Azure App Service created from infra/main.bicep.
+# One-time setup (OIDC, no stored secrets) is described in the README.
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: deploy
+  cancel-in-progress: false
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - name: Build the React app into backend/app/static
+        working-directory: frontend
+        run: |
+          npm ci
+          npm run build
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - name: Fetch the public policy documents
+        run: |
+          pip install pyyaml
+          python backend/scripts/fetch_sources.py || echo "::warning::some source documents could not be fetched; the app seeds with what is available"
+
+      - name: Package the backend
+        working-directory: backend
+        run: zip -r ../app.zip . -x ".venv/*" "tests/*" "data/storage/*" "data/text/*" ".*cache/*" "*/__pycache__/*" ".env"
+
+      - uses: azure/login@v2
+        with:
+          client-id: ${{ vars.AZURE_CLIENT_ID }}
+          tenant-id: ${{ vars.AZURE_TENANT_ID }}
+          subscription-id: ${{ vars.AZURE_SUBSCRIPTION_ID }}
+
+      - uses: azure/webapps-deploy@v3
+        with:
+          app-name: ${{ vars.AZURE_WEBAPP_NAME }}
+          package: app.zip

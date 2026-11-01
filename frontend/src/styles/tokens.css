@@ -1,0 +1,82 @@
+/* Design tokens. Components read only these variables, never raw colours.
+   Palette: warm paper background, ink text, one deep teal accent, and four muted status tones. Flat colour only:
+   no gradients, glows or blur. Every text/background pair below keeps at least WCAG AA contrast (4.5:1). */
+:root {
+  --bg: #f6f5f1;
+  --surface: #ffffff;
+  --surface-2: #efeee9;
+  --text: #1c2430;
+  --muted: #5b6573;
+  --border: #dddbd3;
+
+  --accent: #0f5f5a;
+  --accent-fg: #ffffff;
+  --accent-soft: #e2efec;
+  --accent-soft-fg: #0b4a46;
+
+  --focus: #1a7f78;
+  --danger: #b42318;
+  --mark: #fde68a;
+  --radius: 10px;
+  --radius-lg: 1.25rem;
+  --shadow: 0 1px 2px rgb(28 36 48 / 6%), 0 4px 14px rgb(28 36 48 / 6%);
+  --header-h: 3.75rem;
+
+  /* Tones: background, text and border for each meaning. Used by Pill, Alert and the verdict banner. */
+  --ok-bg: #e7f3ea;
+  --ok-fg: #1d5c33;
+  --ok-border: #b9d9c3;
+  --warning-bg: #fbf0d6;
+  --warning-fg: #7a4a0a;
+  --warning-border: #ecd49a;
+  --danger-bg: #fbe9e6;
+  --danger-fg: #9b2118;
+  --danger-border: #f0bdb6;
+  --info-bg: #e7eef6;
+  --info-fg: #1f4a73;
+  --info-border: #bccee2;
+  --neutral-bg: #edece7;
+  --neutral-fg: #444b55;
+  --neutral-border: #d9d7cf;
+
+  color-scheme: light dark;
+  font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  line-height: 1.55;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #12161b;
+    --surface: #181d24;
+    --surface-2: #1f252d;
+    --text: #e7eaee;
+    --muted: #98a2ae;
+    --border: #2b333d;
+
+    --accent: #55b8ad;
+    --accent-fg: #0a1816;
+    --accent-soft: #1b3231;
+    --accent-soft-fg: #a6e0d9;
+
+    --focus: #6cc5bb;
+    --danger: #f28b82;
+    --mark: #6b5b12;
+    --shadow: 0 1px 2px rgb(0 0 0 / 35%), 0 4px 14px rgb(0 0 0 / 35%);
+
+    --ok-bg: #14291b;
+    --ok-fg: #8fd6a6;
+    --ok-border: #28553a;
+    --warning-bg: #2d2411;
+    --warning-fg: #efd08a;
+    --warning-border: #62491a;
+    --danger-bg: #331a17;
+    --danger-fg: #f5aaa2;
+    --danger-border: #6e332d;
+    --info-bg: #182638;
+    --info-fg: #a9c6e6;
+    --info-border: #2f4a68;
+    --neutral-bg: #222830;
+    --neutral-fg: #bcc4ce;
+    --neutral-border: #343c47;
+  }
+}

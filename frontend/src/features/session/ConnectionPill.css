@@ -1,0 +1,2 @@
+.connection-pill { text-decoration: none; }
+.connection-pill:hover .pill { filter: brightness(0.96); }

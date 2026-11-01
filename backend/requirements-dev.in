@@ -1,0 +1,8 @@
+-c requirements.txt
+-r requirements.in
+pytest
+pytest-asyncio
+httpx
+ruff
+mypy
+types-PyYAML

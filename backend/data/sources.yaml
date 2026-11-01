@@ -1,0 +1,73 @@
+# Seed catalogue: which public documents make up each demo contract.
+# Files under data/raw are NOT committed (third-party documents); run
+#   python scripts/fetch_sources.py
+# to download them from the public URLs below. Foyer's full conditions
+# generales are gated behind a customer + contract number, so only the public
+# IPID and brochure are used for Foyer.
+contracts:
+  - id: foyer-mozaik
+    insurer: Foyer Assurances S.A.
+    product: Mozaik (home)
+    country: LU
+    language: fr
+    synthetic: false
+    documents:
+      - id: foyer-mozaik-ipid
+        title: Mozaik - Insurance Product Information Document (IPID)
+        kind: ipid
+        file: raw/foyer_mozaik_ipid.pdf
+        source_url: https://www.foyer.lu/fr/mydoc/12704
+        version_label: "09/2021"
+        effective_from: "2021-09-01"
+      - id: foyer-mozaik-brochure
+        title: Mozaik - product brochure (marketing)
+        kind: brochure
+        file: raw/foyer_mozaik_brochure.pdf
+        source_url: https://www.foyer.lu/fr/mydoc/12712
+        version_label: "MOZAIK 2026"
+        effective_from: "2026-01-01"
+
+  - id: axa-optihome
+    insurer: AXA Assurances Luxembourg S.A.
+    product: Multirisques Habitation (OptiHome)
+    country: LU
+    language: fr
+    synthetic: false
+    documents:
+      - id: axa-optihome-ipid
+        title: Multirisques Habitation (OptiHome) - IPID
+        kind: ipid
+        file: raw/axa_YiCYJh.pdf
+        source_url: https://axa.lu/sites/axa/files/prismic_import/YiCYJhMAAC0AqL8e.pdf
+        version_label: "W02_22"
+        effective_from: "2022-01-01"
+
+  - id: axa-copropriete
+    insurer: AXA Assurances Luxembourg S.A.
+    product: Multirisques Habitation - building / co-ownership
+    country: LU
+    language: fr
+    synthetic: false
+    documents:
+      - id: axa-copropriete-ipid
+        title: Multirisques Habitation (co-ownership buildings) - IPID
+        kind: ipid
+        file: raw/axa_YiCYSR.pdf
+        source_url: https://axa.lu/sites/axa/files/prismic_import/YiCYSRMAACwAqL--.pdf
+        version_label: "2022"
+        effective_from: "2022-01-01"
+
+  - id: demo-habitat-confort
+    insurer: Exemple Assurances S.A. (fictional)
+    product: Habitat Confort - full general conditions
+    country: LU
+    language: fr
+    synthetic: true
+    documents:
+      - id: demo-habitat-confort-cg
+        title: Habitat Confort - general conditions (synthetic)
+        kind: cg
+        file: synthetic/exemple_habitat_cg.md
+        source_url: null
+        version_label: "v1"
+        effective_from: "2024-01-01"

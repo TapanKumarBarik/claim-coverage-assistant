@@ -1,0 +1,10 @@
+.data-table { overflow-x: auto; }
+.data-table table { width: 100%; border-collapse: collapse; font-size: 0.88rem; }
+.data-table th, .data-table td { text-align: left; padding: 0.5rem 0.6rem; border-bottom: 1px solid var(--border); vertical-align: top; }
+.data-table th { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.04em; color: var(--muted); background: var(--surface-2); }
+.data-table tbody tr:hover { background: var(--surface-2); }
+.data-table .data-table__numeric { text-align: right; font-variant-numeric: tabular-nums; }
+.data-table tbody tr.data-table__row--open { background: var(--surface-2); }
+.data-table tbody tr.data-table__row--open td { border-bottom-color: transparent; }
+.data-table tbody tr.data-table__detail, .data-table tbody tr.data-table__detail:hover { background: var(--surface-2); }
+.data-table .data-table__detail td { padding: 0.25rem 0.6rem 0.9rem; }

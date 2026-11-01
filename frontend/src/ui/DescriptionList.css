@@ -1,0 +1,4 @@
+.description-list { display: grid; grid-template-columns: max-content 1fr; gap: 0.35rem 1rem; margin: 0 0 0.75rem; }
+.description-list__row { display: contents; }
+.description-list dt { color: var(--muted); font-size: 0.85rem; }
+.description-list dd { margin: 0; overflow-wrap: anywhere; }

@@ -1,0 +1,17 @@
+.verdict { display: flex; gap: 0.85rem; align-items: center; background: var(--tone-bg); color: var(--tone-fg); padding: 0.85rem 1.1rem; border-radius: 14px; border: 1px solid var(--tone-border); box-shadow: inset 4px 0 0 var(--tone-fg); margin-bottom: 0.75rem; }
+.verdict__icon { flex: none; width: 2rem; height: 2rem; display: grid; place-items: center; border-radius: 50%; background: var(--tone-fg); color: var(--tone-bg); font-weight: 700; font-size: 1.05rem; }
+.verdict__label { margin: 0; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; }
+.verdict__headline { margin: 0.1rem 0 0; font-size: 1.05rem; }
+.confidence { display: flex; flex-wrap: wrap; gap: 0.6rem; align-items: center; font-size: 0.9rem; margin-bottom: 0.75rem; }
+.assessment .alert { margin-bottom: 0.75rem; font-size: 0.9rem; }
+.assessment__reasoning { white-space: pre-line; }
+.assessment__block { margin-top: 1rem; }
+.assessment .assessment__flush { margin-top: 0; }
+.assessment__footer { margin-top: 1rem; font-size: 0.8rem; color: var(--muted); }
+.assessment__footer p { margin-bottom: 0.25rem; }
+.evidence-list { list-style: none; padding: 0; margin: 0; display: grid; gap: 0.5rem; }
+.evidence { background: var(--surface-2); border-radius: 12px; padding: 0.6rem 0.9rem 0.7rem; }
+.evidence__head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0.25rem 0.75rem; font-size: 0.85rem; }
+.evidence__quote { margin: 0.35rem 0; padding-left: 0.75rem; border-left: 3px solid var(--accent); font-style: italic; }
+.evidence__source { margin: 0; font-size: 0.82rem; color: var(--muted); }
+.evidence__passage { margin: 0.6rem 0 0; padding: 0.6rem 0.75rem; background: var(--surface); border-radius: 10px; font-size: 0.88rem; white-space: pre-line; }

@@ -1,0 +1,6 @@
+.meter__head { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 0.25rem 1rem; font-size: 0.88rem; margin-bottom: 0.35rem; }
+.meter__label { font-weight: 600; }
+.meter__value { font-variant-numeric: tabular-nums; }
+.meter__track { height: 0.6rem; background: var(--surface-2); border: 1px solid var(--border); border-radius: 999px; overflow: hidden; }
+.meter__fill { display: block; height: 100%; background: var(--tone-fg); border-radius: 999px; }
+.meter__hint { margin: 0.35rem 0 0; font-size: 0.8rem; color: var(--muted); }

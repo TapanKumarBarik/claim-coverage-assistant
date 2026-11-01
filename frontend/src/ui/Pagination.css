@@ -1,0 +1,2 @@
+.pagination { display: flex; align-items: center; justify-content: flex-end; gap: 0.5rem; margin-top: 0.85rem; }
+.pagination > span { margin-right: auto; }

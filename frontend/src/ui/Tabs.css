@@ -1,0 +1,13 @@
+.tabs__bar { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 0.75rem; align-items: center; margin-bottom: 1rem; }
+.tabs__list { display: inline-flex; flex-wrap: wrap; gap: 0.25rem; }
+.tabs__tab { font: inherit; cursor: pointer; padding: 0.45rem 0.85rem; border-radius: 8px; border: 1px solid var(--border); background: var(--surface); color: var(--text); }
+.tabs__tab:hover { background: var(--surface-2); }
+.tabs__tab[aria-selected="true"] { background: var(--accent-soft); color: var(--accent-soft-fg); border-color: transparent; font-weight: 600; }
+.tabs__actions { display: flex; gap: 1rem; align-items: center; flex-wrap: wrap; }
+
+/* Tabs inside another tab's panel: plain text with an underline, so they read as a lower level. */
+.tabs--secondary .tabs__bar { border-bottom: 1px solid var(--border); gap: 0.5rem 1rem; }
+.tabs--secondary .tabs__list { gap: 1.25rem; }
+.tabs--secondary .tabs__tab { padding: 0.5rem 0.1rem; margin-bottom: -1px; border: 0; border-bottom: 2px solid transparent; border-radius: 0; background: none; color: var(--muted); }
+.tabs--secondary .tabs__tab:hover { background: none; color: var(--text); }
+.tabs--secondary .tabs__tab[aria-selected="true"] { background: none; border-bottom-color: var(--accent); color: var(--text); }

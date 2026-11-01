@@ -1,0 +1,7 @@
+/* The admin sign-in: one centred card, nothing else on the page. */
+.login { max-width: 26rem; margin: 3.5rem auto; padding: 2.25rem 2rem 1.75rem; text-align: center; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); }
+.login h2 { margin: 1.1rem 0 0.35rem; font-size: 1.4rem; }
+.login__intro { margin-bottom: 1.5rem; }
+.login__form { text-align: left; }
+.login__form .button { width: 100%; }
+.login__back { display: inline-block; margin-top: 1.25rem; font-size: 0.9rem; }

@@ -1,0 +1,5 @@
+.field { display: block; margin-bottom: 1rem; }
+.field--narrow { max-width: 14rem; }
+.field__note { display: block; font-size: 0.8rem; color: var(--muted); margin-top: 0.25rem; }
+.field__note--end { text-align: right; }
+.field__error { display: block; color: var(--danger); font-size: 0.85rem; margin-top: 0.25rem; }

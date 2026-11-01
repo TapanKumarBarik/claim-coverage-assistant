@@ -1,0 +1,15 @@
+.breakdown-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(18rem, 1fr)); gap: 1.25rem; }
+.breakdown h4 { margin-bottom: 0.4rem; }
+.health-issues { margin: 0; padding-left: 1.1rem; }
+.flag-list { display: flex; flex-wrap: wrap; gap: 0.25rem; }
+.event-detail { display: grid; gap: 0.6rem; }
+.event-detail .description-list { margin: 0; }
+.event-excerpt { overflow-wrap: anywhere; }
+.policy-section { margin-top: 1.25rem; }
+.policy-section h4 { margin-bottom: 0.4rem; }
+.policy-list { list-style: none; padding: 0; margin: 0; display: grid; gap: 0.4rem; font-size: 0.9rem; }
+.policy-list li { display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: baseline; }
+
+/* The time window sits in the tab bar; its label and control share a line there. */
+.tabs__actions .field, .tabs__actions .field--narrow { display: flex; align-items: center; gap: 0.5rem; margin: 0; max-width: none; }
+.tabs__actions .field .label { margin: 0; white-space: nowrap; }

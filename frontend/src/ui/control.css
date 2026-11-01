@@ -1,0 +1,4 @@
+/* Shared look of TextInput, TextArea and Select. */
+.control { width: 100%; padding: 0.55rem 0.65rem; font: inherit; color: var(--text); background: var(--surface); border: 1px solid var(--border); border-radius: 8px; }
+textarea.control { resize: vertical; min-height: 7rem; }
+.control[aria-invalid="true"] { border-color: var(--danger); }

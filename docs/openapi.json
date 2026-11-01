@@ -1,0 +1,4611 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Claim Coverage Assistant",
+    "summary": "Cited, honest answers to 'is this home-insurance claim covered?'",
+    "description": "Assesses a claim against the policy documents in force on the loss date. Every conclusion cites verified quotes; weak evidence lowers confidence instead of being hidden. Bring your own Azure OpenAI credentials.",
+    "version": "0.1.0"
+  },
+  "paths": {
+    "/api/healthz": {
+      "get": {
+        "tags": [
+          "public"
+        ],
+        "summary": "Liveness probe",
+        "operationId": "healthz_api_healthz_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Health"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/readyz": {
+      "get": {
+        "tags": [
+          "public"
+        ],
+        "summary": "Readiness probe",
+        "operationId": "readyz_api_readyz_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Readiness"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Service Unavailable",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Readiness"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/contracts": {
+      "get": {
+        "tags": [
+          "public"
+        ],
+        "summary": "Contracts that can be queried",
+        "operationId": "list_contracts_api_contracts_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/ContractPublic"
+                  },
+                  "type": "array",
+                  "title": "Response List Contracts Api Contracts Get"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/examples": {
+      "get": {
+        "tags": [
+          "public"
+        ],
+        "summary": "Preset example claims",
+        "operationId": "list_examples_api_examples_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/Example"
+                  },
+                  "type": "array",
+                  "title": "Response List Examples Api Examples Get"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/analyze": {
+      "post": {
+        "tags": [
+          "public"
+        ],
+        "summary": "Assess a claim, or answer a greeting",
+        "operationId": "analyze_api_analyze_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AnalyzeRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/AssessmentResponse"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ReplyResponse"
+                    }
+                  ],
+                  "title": "Response Analyze Api Analyze Post",
+                  "discriminator": {
+                    "propertyName": "kind",
+                    "mapping": {
+                      "assessment": "#/components/schemas/AssessmentResponse",
+                      "reply": "#/components/schemas/ReplyResponse"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "Content Too Large",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable Content",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "428": {
+            "description": "Precondition Required",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too Many Requests",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "502": {
+            "description": "Bad Gateway",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Service Unavailable",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/feedback": {
+      "post": {
+        "tags": [
+          "public"
+        ],
+        "summary": "Like or dislike an answer",
+        "operationId": "feedback_api_feedback_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/FeedbackInput"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Feedback"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable Content",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too Many Requests",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/session": {
+      "get": {
+        "tags": [
+          "session"
+        ],
+        "summary": "Which Azure OpenAI credentials are in use",
+        "operationId": "get_session_api_session_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SessionStatus"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable Content",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too Many Requests",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Service Unavailable",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/session/credentials": {
+      "put": {
+        "tags": [
+          "session"
+        ],
+        "summary": "Verify and use your own Azure OpenAI credentials",
+        "operationId": "put_credentials_api_session_credentials_put",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CredentialsInput"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SessionStatus"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable Content",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too Many Requests",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Service Unavailable",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "session"
+        ],
+        "summary": "Forget your credentials",
+        "operationId": "delete_credentials_api_session_credentials_delete",
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable Content",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too Many Requests",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Service Unavailable",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/session": {
+      "get": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Am I signed in as administrator?",
+        "description": "The page asks this on load. Being signed out is an answer, not a failed attempt: not counted.",
+        "operationId": "current_api_admin_session_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminSessionStatus"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable Content",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too Many Requests",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Service Unavailable",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Sign in as administrator",
+        "operationId": "sign_in_api_admin_session_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AdminLogin"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminSessionStatus"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable Content",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too Many Requests",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Service Unavailable",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Sign out",
+        "operationId": "sign_out_api_admin_session_delete",
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable Content",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too Many Requests",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Service Unavailable",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/catalog": {
+      "get": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Full catalogue with every version",
+        "operationId": "get_catalog_api_admin_catalog_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Catalog"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too Many Requests",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Service Unavailable",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/contracts": {
+      "post": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Create a contract",
+        "operationId": "create_contract_api_admin_contracts_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateContract"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Contract"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too Many Requests",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Service Unavailable",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/documents": {
+      "post": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Add a document to a contract",
+        "operationId": "create_document_api_admin_documents_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateDocument"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Document"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too Many Requests",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Service Unavailable",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/documents/{document_id}/versions": {
+      "post": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Upload a new version as a draft",
+        "operationId": "upload_version_api_admin_documents__document_id__versions_post",
+        "parameters": [
+          {
+            "name": "document_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Document Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/Body_upload_version_api_admin_documents__document_id__versions_post"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DocumentVersion"
+                }
+              }
+            }
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Too Many Requests"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Service Unavailable"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/versions/{version_id}/chunks": {
+      "get": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Preview how a version was parsed",
+        "operationId": "version_chunks_api_admin_versions__version_id__chunks_get",
+        "parameters": [
+          {
+            "name": "version_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Version Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Chunk"
+                  },
+                  "title": "Response Version Chunks Api Admin Versions  Version Id  Chunks Get"
+                }
+              }
+            }
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Too Many Requests"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Service Unavailable"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/versions/{version_id}/activate": {
+      "post": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Make a draft live",
+        "operationId": "activate_api_admin_versions__version_id__activate_post",
+        "parameters": [
+          {
+            "name": "version_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Version Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DocumentVersion"
+                }
+              }
+            }
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Too Many Requests"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Service Unavailable"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/versions/{version_id}/withdraw": {
+      "post": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Take a live version out of use",
+        "operationId": "withdraw_api_admin_versions__version_id__withdraw_post",
+        "parameters": [
+          {
+            "name": "version_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Version Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DocumentVersion"
+                }
+              }
+            }
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Too Many Requests"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Service Unavailable"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/versions/{version_id}/reindex": {
+      "post": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Recompute embeddings",
+        "operationId": "reindex_api_admin_versions__version_id__reindex_post",
+        "parameters": [
+          {
+            "name": "version_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Version Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DocumentVersion"
+                }
+              }
+            }
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Too Many Requests"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Service Unavailable"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/versions/{version_id}": {
+      "delete": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Delete a draft or withdrawn version",
+        "operationId": "delete_version_api_admin_versions__version_id__delete",
+        "parameters": [
+          {
+            "name": "version_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Version Id"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Too Many Requests"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Service Unavailable"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/audit": {
+      "get": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Recent catalogue changes",
+        "operationId": "audit_api_admin_audit_get",
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 100,
+              "title": "Limit"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/AuditEntry"
+                  },
+                  "title": "Response Audit Api Admin Audit Get"
+                }
+              }
+            }
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Too Many Requests"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Service Unavailable"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/conversations": {
+      "get": {
+        "tags": [
+          "conversations"
+        ],
+        "summary": "Conversations and their feedback, newest first",
+        "operationId": "conversations_api_admin_conversations_get",
+        "parameters": [
+          {
+            "name": "feedback",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "$ref": "#/components/schemas/FeedbackFilter"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Feedback"
+            }
+          },
+          {
+            "name": "q",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "maxLength": 100
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Text to find in questions and comments.",
+              "title": "Q"
+            },
+            "description": "Text to find in questions and comments."
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 100,
+              "minimum": 1,
+              "default": 25,
+              "title": "Limit"
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "default": 0,
+              "title": "Offset"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConversationPage"
+                }
+              }
+            }
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Too Many Requests"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Service Unavailable"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/conversations/stats": {
+      "get": {
+        "tags": [
+          "conversations"
+        ],
+        "summary": "How many answers were liked or disliked",
+        "operationId": "stats_api_admin_conversations_stats_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FeedbackStats"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too Many Requests",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Service Unavailable",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/conversations/{request_id}": {
+      "get": {
+        "tags": [
+          "conversations"
+        ],
+        "summary": "One conversation in full",
+        "operationId": "conversation_api_admin_conversations__request_id__get",
+        "parameters": [
+          {
+            "name": "request_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9-]{8,64}$",
+              "title": "Request Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConversationDetail"
+                }
+              }
+            }
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Too Many Requests"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Service Unavailable"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "conversations"
+        ],
+        "summary": "Delete a conversation",
+        "operationId": "delete_conversation_api_admin_conversations__request_id__delete",
+        "parameters": [
+          {
+            "name": "request_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9-]{8,64}$",
+              "title": "Request Id"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Too Many Requests"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Service Unavailable"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/governance/summary": {
+      "get": {
+        "tags": [
+          "governance"
+        ],
+        "summary": "Usage, safety and quality over a time window",
+        "operationId": "summary_api_admin_governance_summary_get",
+        "parameters": [
+          {
+            "name": "hours",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 720,
+              "minimum": 1,
+              "default": 24,
+              "title": "Hours"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GovernanceSummary"
+                }
+              }
+            }
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Too Many Requests"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Service Unavailable"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/governance/events": {
+      "get": {
+        "tags": [
+          "governance"
+        ],
+        "summary": "Recent AI requests, newest first",
+        "operationId": "events_api_admin_governance_events_get",
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 500,
+              "minimum": 1,
+              "default": 100,
+              "title": "Limit"
+            }
+          },
+          {
+            "name": "outcome",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "$ref": "#/components/schemas/Outcome"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Outcome"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/AiEvent"
+                  },
+                  "title": "Response Events Api Admin Governance Events Get"
+                }
+              }
+            }
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Too Many Requests"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Service Unavailable"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/governance/policy": {
+      "get": {
+        "tags": [
+          "governance"
+        ],
+        "summary": "The rules the AI currently runs under",
+        "operationId": "policy_api_admin_governance_policy_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GovernancePolicy"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too Many Requests",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Service Unavailable",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "AbuseStats": {
+        "properties": {
+          "blocked_requests": {
+            "type": "integer",
+            "title": "Blocked Requests"
+          },
+          "rate_limited": {
+            "type": "integer",
+            "title": "Rate Limited"
+          },
+          "locked_out_clients_now": {
+            "type": "integer",
+            "title": "Locked Out Clients Now"
+          }
+        },
+        "type": "object",
+        "required": [
+          "blocked_requests",
+          "rate_limited",
+          "locked_out_clients_now"
+        ],
+        "title": "AbuseStats"
+      },
+      "AdminLogin": {
+        "properties": {
+          "password": {
+            "type": "string",
+            "maxLength": 256,
+            "minLength": 1,
+            "format": "password",
+            "title": "Password",
+            "description": "Never stored, never returned.",
+            "writeOnly": true
+          }
+        },
+        "type": "object",
+        "required": [
+          "password"
+        ],
+        "title": "AdminLogin"
+      },
+      "AdminSessionStatus": {
+        "properties": {
+          "expires_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Expires At",
+            "description": "When the sign-in ends if nothing else happens; null for bearer-token callers."
+          }
+        },
+        "type": "object",
+        "required": [
+          "expires_at"
+        ],
+        "title": "AdminSessionStatus"
+      },
+      "AiEvent": {
+        "properties": {
+          "ts": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Ts"
+          },
+          "request_id": {
+            "type": "string",
+            "title": "Request Id"
+          },
+          "client": {
+            "type": "string",
+            "title": "Client"
+          },
+          "outcome": {
+            "$ref": "#/components/schemas/Outcome"
+          },
+          "error_code": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ErrorCode"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "intent": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Intent"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "contract_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Contract Id"
+          },
+          "language": {
+            "$ref": "#/components/schemas/Language"
+          },
+          "credential_source": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/CredentialSource"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "tiers": {
+            "items": {
+              "$ref": "#/components/schemas/ModelTier"
+            },
+            "type": "array",
+            "title": "Tiers"
+          },
+          "models": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Models"
+          },
+          "prompt_tokens": {
+            "type": "integer",
+            "title": "Prompt Tokens",
+            "default": 0
+          },
+          "completion_tokens": {
+            "type": "integer",
+            "title": "Completion Tokens",
+            "default": 0
+          },
+          "tokens_by_tier": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "type": "object",
+            "title": "Tokens By Tier"
+          },
+          "latency_ms": {
+            "type": "integer",
+            "title": "Latency Ms",
+            "default": 0
+          },
+          "steps": {
+            "type": "integer",
+            "title": "Steps",
+            "default": 0
+          },
+          "tools": {
+            "items": {
+              "$ref": "#/components/schemas/ToolName"
+            },
+            "type": "array",
+            "title": "Tools"
+          },
+          "guard_flags": {
+            "items": {
+              "$ref": "#/components/schemas/GuardCode"
+            },
+            "type": "array",
+            "title": "Guard Flags"
+          },
+          "verdict": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Verdict"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "confidence": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Confidence"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "citations_verified": {
+            "type": "integer",
+            "title": "Citations Verified",
+            "default": 0
+          },
+          "citations_dropped": {
+            "type": "integer",
+            "title": "Citations Dropped",
+            "default": 0
+          },
+          "retrieval_mode": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/RetrievalMode"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "blocked_excerpt": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Blocked Excerpt"
+          }
+        },
+        "type": "object",
+        "required": [
+          "ts",
+          "request_id",
+          "client",
+          "outcome",
+          "error_code",
+          "intent",
+          "contract_id",
+          "language",
+          "credential_source",
+          "tiers",
+          "models",
+          "prompt_tokens",
+          "completion_tokens",
+          "tokens_by_tier",
+          "latency_ms",
+          "steps",
+          "tools",
+          "guard_flags",
+          "verdict",
+          "confidence",
+          "citations_verified",
+          "citations_dropped",
+          "retrieval_mode",
+          "blocked_excerpt"
+        ],
+        "title": "AiEvent",
+        "description": "One request through the AI pipeline. Never contains the claim text, only its fate."
+      },
+      "AnalyzeRequest": {
+        "properties": {
+          "contract_id": {
+            "type": "string",
+            "maxLength": 64,
+            "minLength": 2,
+            "title": "Contract Id"
+          },
+          "claim": {
+            "type": "string",
+            "maxLength": 4000,
+            "minLength": 1,
+            "title": "Claim",
+            "description": "What happened, in the claimant's words. May also be a greeting or a question."
+          },
+          "loss_date": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Loss Date",
+            "description": "Date of loss; defaults to today. Selects the policy version in force."
+          },
+          "language": {
+            "$ref": "#/components/schemas/Language",
+            "default": "en"
+          }
+        },
+        "type": "object",
+        "required": [
+          "contract_id",
+          "claim"
+        ],
+        "title": "AnalyzeRequest"
+      },
+      "AssessmentResponse": {
+        "properties": {
+          "kind": {
+            "type": "string",
+            "const": "assessment",
+            "title": "Kind",
+            "default": "assessment"
+          },
+          "request_id": {
+            "type": "string",
+            "title": "Request Id"
+          },
+          "generated_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Generated At",
+            "description": "When the answer was produced (UTC)."
+          },
+          "contract_id": {
+            "type": "string",
+            "title": "Contract Id"
+          },
+          "loss_date": {
+            "type": "string",
+            "format": "date",
+            "title": "Loss Date"
+          },
+          "language": {
+            "$ref": "#/components/schemas/Language"
+          },
+          "verdict": {
+            "$ref": "#/components/schemas/Verdict"
+          },
+          "headline": {
+            "type": "string",
+            "title": "Headline"
+          },
+          "reasoning": {
+            "type": "string",
+            "title": "Reasoning"
+          },
+          "confidence": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Confidence"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Only for decisive verdicts; derived from verified evidence, not model self-report."
+          },
+          "evidence_strength": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/DocKind"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "evidence": {
+            "items": {
+              "$ref": "#/components/schemas/EvidenceItem"
+            },
+            "type": "array",
+            "title": "Evidence"
+          },
+          "missing_information": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Missing Information"
+          },
+          "next_steps": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Next Steps"
+          },
+          "caveats": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Caveats"
+          },
+          "documents_used": {
+            "items": {
+              "$ref": "#/components/schemas/DocumentUsed"
+            },
+            "type": "array",
+            "title": "Documents Used"
+          },
+          "retrieval": {
+            "$ref": "#/components/schemas/RetrievalInfo"
+          },
+          "model": {
+            "type": "string",
+            "title": "Model"
+          },
+          "latency_ms": {
+            "type": "integer",
+            "title": "Latency Ms"
+          },
+          "disclaimer": {
+            "type": "string",
+            "title": "Disclaimer"
+          }
+        },
+        "type": "object",
+        "required": [
+          "kind",
+          "request_id",
+          "generated_at",
+          "contract_id",
+          "loss_date",
+          "language",
+          "verdict",
+          "headline",
+          "reasoning",
+          "confidence",
+          "evidence_strength",
+          "evidence",
+          "missing_information",
+          "next_steps",
+          "caveats",
+          "documents_used",
+          "retrieval",
+          "model",
+          "latency_ms",
+          "disclaimer"
+        ],
+        "title": "AssessmentResponse"
+      },
+      "AuditEntry": {
+        "properties": {
+          "at": {
+            "type": "string",
+            "title": "At"
+          },
+          "actor": {
+            "type": "string",
+            "title": "Actor"
+          },
+          "action": {
+            "type": "string",
+            "title": "Action"
+          }
+        },
+        "additionalProperties": true,
+        "type": "object",
+        "required": [
+          "at",
+          "actor",
+          "action"
+        ],
+        "title": "AuditEntry",
+        "description": "One catalogue change. Extra keys (contract, document, version...) describe what was touched."
+      },
+      "Body_upload_version_api_admin_documents__document_id__versions_post": {
+        "properties": {
+          "file": {
+            "type": "string",
+            "contentMediaType": "application/octet-stream",
+            "title": "File"
+          },
+          "label": {
+            "type": "string",
+            "maxLength": 60,
+            "minLength": 1,
+            "title": "Label"
+          },
+          "effective_from": {
+            "type": "string",
+            "format": "date",
+            "title": "Effective From"
+          }
+        },
+        "type": "object",
+        "required": [
+          "file",
+          "label",
+          "effective_from"
+        ],
+        "title": "Body_upload_version_api_admin_documents__document_id__versions_post"
+      },
+      "BreakerState": {
+        "type": "string",
+        "enum": [
+          "closed",
+          "open",
+          "half_open"
+        ],
+        "title": "BreakerState"
+      },
+      "BreakerStatus": {
+        "properties": {
+          "state": {
+            "$ref": "#/components/schemas/BreakerState"
+          },
+          "consecutive_failures": {
+            "type": "integer",
+            "title": "Consecutive Failures"
+          }
+        },
+        "type": "object",
+        "required": [
+          "state",
+          "consecutive_failures"
+        ],
+        "title": "BreakerStatus"
+      },
+      "BudgetStatus": {
+        "properties": {
+          "global_used": {
+            "type": "integer",
+            "title": "Global Used"
+          },
+          "global_limit": {
+            "type": "integer",
+            "title": "Global Limit"
+          },
+          "client_limit": {
+            "type": "integer",
+            "title": "Client Limit"
+          }
+        },
+        "type": "object",
+        "required": [
+          "global_used",
+          "global_limit",
+          "client_limit"
+        ],
+        "title": "BudgetStatus"
+      },
+      "Catalog": {
+        "properties": {
+          "schema_version": {
+            "type": "integer",
+            "title": "Schema Version",
+            "default": 1
+          },
+          "contracts": {
+            "items": {
+              "$ref": "#/components/schemas/Contract"
+            },
+            "type": "array",
+            "title": "Contracts"
+          }
+        },
+        "type": "object",
+        "required": [
+          "schema_version",
+          "contracts"
+        ],
+        "title": "Catalog"
+      },
+      "ChangeSummary": {
+        "properties": {
+          "compared_to": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Compared To"
+          },
+          "added": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Added"
+          },
+          "removed": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Removed"
+          },
+          "modified": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Modified"
+          },
+          "unchanged": {
+            "type": "integer",
+            "title": "Unchanged",
+            "default": 0
+          }
+        },
+        "type": "object",
+        "required": [
+          "compared_to",
+          "added",
+          "removed",
+          "modified",
+          "unchanged"
+        ],
+        "title": "ChangeSummary"
+      },
+      "Chunk": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "document_id": {
+            "type": "string",
+            "title": "Document Id"
+          },
+          "version_id": {
+            "type": "string",
+            "title": "Version Id"
+          },
+          "ordinal": {
+            "type": "integer",
+            "title": "Ordinal"
+          },
+          "section": {
+            "type": "string",
+            "title": "Section"
+          },
+          "page": {
+            "type": "integer",
+            "title": "Page"
+          },
+          "text": {
+            "type": "string",
+            "title": "Text"
+          },
+          "pinned": {
+            "type": "boolean",
+            "title": "Pinned",
+            "default": false
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "document_id",
+          "version_id",
+          "ordinal",
+          "section",
+          "page",
+          "text",
+          "pinned"
+        ],
+        "title": "Chunk"
+      },
+      "CitationRole": {
+        "type": "string",
+        "enum": [
+          "grants",
+          "excludes",
+          "condition",
+          "limit"
+        ],
+        "title": "CitationRole"
+      },
+      "CitationStats": {
+        "properties": {
+          "verified": {
+            "type": "integer",
+            "title": "Verified"
+          },
+          "dropped": {
+            "type": "integer",
+            "title": "Dropped"
+          },
+          "verify_rate": {
+            "type": "number",
+            "title": "Verify Rate"
+          }
+        },
+        "type": "object",
+        "required": [
+          "verified",
+          "dropped",
+          "verify_rate"
+        ],
+        "title": "CitationStats"
+      },
+      "Confidence": {
+        "type": "string",
+        "enum": [
+          "high",
+          "medium",
+          "low"
+        ],
+        "title": "Confidence"
+      },
+      "Contract": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "insurer": {
+            "type": "string",
+            "title": "Insurer"
+          },
+          "product": {
+            "type": "string",
+            "title": "Product"
+          },
+          "country": {
+            "type": "string",
+            "title": "Country",
+            "default": "LU"
+          },
+          "language": {
+            "type": "string",
+            "title": "Language",
+            "default": "fr"
+          },
+          "synthetic": {
+            "type": "boolean",
+            "title": "Synthetic",
+            "default": false
+          },
+          "documents": {
+            "items": {
+              "$ref": "#/components/schemas/Document"
+            },
+            "type": "array",
+            "title": "Documents"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "insurer",
+          "product",
+          "country",
+          "language",
+          "synthetic",
+          "documents"
+        ],
+        "title": "Contract"
+      },
+      "ContractPublic": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "insurer": {
+            "type": "string",
+            "title": "Insurer"
+          },
+          "product": {
+            "type": "string",
+            "title": "Product"
+          },
+          "country": {
+            "type": "string",
+            "title": "Country"
+          },
+          "language": {
+            "type": "string",
+            "title": "Language"
+          },
+          "synthetic": {
+            "type": "boolean",
+            "title": "Synthetic"
+          },
+          "documents": {
+            "items": {
+              "$ref": "#/components/schemas/DocumentPublic"
+            },
+            "type": "array",
+            "title": "Documents"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "insurer",
+          "product",
+          "country",
+          "language",
+          "synthetic",
+          "documents"
+        ],
+        "title": "ContractPublic"
+      },
+      "ConversationDetail": {
+        "properties": {
+          "request_id": {
+            "type": "string",
+            "title": "Request Id"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          },
+          "contract_id": {
+            "type": "string",
+            "title": "Contract Id"
+          },
+          "language": {
+            "$ref": "#/components/schemas/Language"
+          },
+          "kind": {
+            "$ref": "#/components/schemas/ResponseKind"
+          },
+          "verdict": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Verdict"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "confidence": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Confidence"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "preview": {
+            "type": "string",
+            "title": "Preview",
+            "description": "The start of the question, personal data masked."
+          },
+          "model": {
+            "type": "string",
+            "title": "Model"
+          },
+          "latency_ms": {
+            "type": "integer",
+            "title": "Latency Ms"
+          },
+          "rating": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Rating"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "rated_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Rated At"
+          },
+          "has_comment": {
+            "type": "boolean",
+            "title": "Has Comment"
+          },
+          "question": {
+            "type": "string",
+            "title": "Question",
+            "description": "The full question as the model saw it: personal data is masked."
+          },
+          "comment": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Comment"
+          },
+          "response": {
+            "anyOf": [
+              {
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/AssessmentResponse"
+                  },
+                  {
+                    "$ref": "#/components/schemas/ReplyResponse"
+                  }
+                ],
+                "discriminator": {
+                  "propertyName": "kind",
+                  "mapping": {
+                    "assessment": "#/components/schemas/AssessmentResponse",
+                    "reply": "#/components/schemas/ReplyResponse"
+                  }
+                }
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Response",
+            "description": "The answer as the visitor saw it; null if saved in a format this version cannot read."
+          }
+        },
+        "type": "object",
+        "required": [
+          "request_id",
+          "created_at",
+          "contract_id",
+          "language",
+          "kind",
+          "verdict",
+          "confidence",
+          "preview",
+          "model",
+          "latency_ms",
+          "rating",
+          "rated_at",
+          "has_comment",
+          "question",
+          "comment",
+          "response"
+        ],
+        "title": "ConversationDetail"
+      },
+      "ConversationPage": {
+        "properties": {
+          "total": {
+            "type": "integer",
+            "title": "Total"
+          },
+          "limit": {
+            "type": "integer",
+            "title": "Limit"
+          },
+          "offset": {
+            "type": "integer",
+            "title": "Offset"
+          },
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/ConversationSummary"
+            },
+            "type": "array",
+            "title": "Items"
+          }
+        },
+        "type": "object",
+        "required": [
+          "total",
+          "limit",
+          "offset",
+          "items"
+        ],
+        "title": "ConversationPage"
+      },
+      "ConversationSummary": {
+        "properties": {
+          "request_id": {
+            "type": "string",
+            "title": "Request Id"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          },
+          "contract_id": {
+            "type": "string",
+            "title": "Contract Id"
+          },
+          "language": {
+            "$ref": "#/components/schemas/Language"
+          },
+          "kind": {
+            "$ref": "#/components/schemas/ResponseKind"
+          },
+          "verdict": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Verdict"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "confidence": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Confidence"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "preview": {
+            "type": "string",
+            "title": "Preview",
+            "description": "The start of the question, personal data masked."
+          },
+          "model": {
+            "type": "string",
+            "title": "Model"
+          },
+          "latency_ms": {
+            "type": "integer",
+            "title": "Latency Ms"
+          },
+          "rating": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Rating"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "rated_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Rated At"
+          },
+          "has_comment": {
+            "type": "boolean",
+            "title": "Has Comment"
+          }
+        },
+        "type": "object",
+        "required": [
+          "request_id",
+          "created_at",
+          "contract_id",
+          "language",
+          "kind",
+          "verdict",
+          "confidence",
+          "preview",
+          "model",
+          "latency_ms",
+          "rating",
+          "rated_at",
+          "has_comment"
+        ],
+        "title": "ConversationSummary",
+        "description": "One row of the admin table."
+      },
+      "CreateContract": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "insurer": {
+            "type": "string",
+            "maxLength": 120,
+            "minLength": 2,
+            "title": "Insurer"
+          },
+          "product": {
+            "type": "string",
+            "maxLength": 120,
+            "minLength": 2,
+            "title": "Product"
+          },
+          "country": {
+            "type": "string",
+            "title": "Country",
+            "default": "LU"
+          },
+          "language": {
+            "$ref": "#/components/schemas/Language",
+            "default": "fr"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "insurer",
+          "product"
+        ],
+        "title": "CreateContract"
+      },
+      "CreateDocument": {
+        "properties": {
+          "contract_id": {
+            "type": "string",
+            "title": "Contract Id"
+          },
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "title": {
+            "type": "string",
+            "maxLength": 200,
+            "minLength": 2,
+            "title": "Title"
+          },
+          "kind": {
+            "$ref": "#/components/schemas/DocKind"
+          },
+          "source_url": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 500
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Source Url"
+          }
+        },
+        "type": "object",
+        "required": [
+          "contract_id",
+          "id",
+          "title",
+          "kind"
+        ],
+        "title": "CreateDocument"
+      },
+      "CredentialSource": {
+        "type": "string",
+        "enum": [
+          "session",
+          "server",
+          "none"
+        ],
+        "title": "CredentialSource"
+      },
+      "CredentialsInput": {
+        "properties": {
+          "endpoint": {
+            "type": "string",
+            "maxLength": 200,
+            "minLength": 12,
+            "title": "Endpoint",
+            "description": "https://<resource>.openai.azure.com (Azure hosts only)."
+          },
+          "api_key": {
+            "type": "string",
+            "maxLength": 512,
+            "minLength": 8,
+            "format": "password",
+            "title": "Api Key",
+            "description": "Never stored on disk, never returned.",
+            "writeOnly": true
+          },
+          "reasoning_deployment": {
+            "type": "string",
+            "maxLength": 64,
+            "minLength": 1,
+            "pattern": "^[A-Za-z0-9._-]+$",
+            "title": "Reasoning Deployment",
+            "description": "Deployment name of the thinking model."
+          },
+          "fast_deployment": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 64,
+                "pattern": "^[A-Za-z0-9._-]+$"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Fast Deployment",
+            "description": "Deployment name of a small model for greetings; defaults to the reasoning deployment."
+          },
+          "api_version": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 40,
+                "pattern": "^(\\d{4}-\\d{2}-\\d{2}(-preview)?|v\\d+)$"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Api Version"
+          }
+        },
+        "type": "object",
+        "required": [
+          "endpoint",
+          "api_key",
+          "reasoning_deployment"
+        ],
+        "title": "CredentialsInput"
+      },
+      "DocKind": {
+        "type": "string",
+        "enum": [
+          "cg",
+          "ipid",
+          "brochure"
+        ],
+        "title": "DocKind"
+      },
+      "Document": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "kind": {
+            "$ref": "#/components/schemas/DocKind"
+          },
+          "source_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Source Url"
+          },
+          "versions": {
+            "items": {
+              "$ref": "#/components/schemas/DocumentVersion"
+            },
+            "type": "array",
+            "title": "Versions"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "title",
+          "kind",
+          "source_url",
+          "versions"
+        ],
+        "title": "Document"
+      },
+      "DocumentPublic": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "kind": {
+            "$ref": "#/components/schemas/DocKind"
+          },
+          "source_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Source Url"
+          },
+          "current": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/VersionPublic"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "title",
+          "kind",
+          "source_url",
+          "current"
+        ],
+        "title": "DocumentPublic"
+      },
+      "DocumentUsed": {
+        "properties": {
+          "document_id": {
+            "type": "string",
+            "title": "Document Id"
+          },
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "kind": {
+            "$ref": "#/components/schemas/DocKind"
+          },
+          "version_id": {
+            "type": "string",
+            "title": "Version Id"
+          },
+          "version_label": {
+            "type": "string",
+            "title": "Version Label"
+          },
+          "effective_from": {
+            "type": "string",
+            "format": "date",
+            "title": "Effective From"
+          },
+          "sha256": {
+            "type": "string",
+            "title": "Sha256"
+          }
+        },
+        "type": "object",
+        "required": [
+          "document_id",
+          "title",
+          "kind",
+          "version_id",
+          "version_label",
+          "effective_from",
+          "sha256"
+        ],
+        "title": "DocumentUsed"
+      },
+      "DocumentVersion": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "label": {
+            "type": "string",
+            "title": "Label"
+          },
+          "status": {
+            "$ref": "#/components/schemas/VersionStatus"
+          },
+          "effective_from": {
+            "type": "string",
+            "format": "date",
+            "title": "Effective From"
+          },
+          "sha256": {
+            "type": "string",
+            "title": "Sha256"
+          },
+          "filename": {
+            "type": "string",
+            "title": "Filename"
+          },
+          "pages": {
+            "type": "integer",
+            "title": "Pages"
+          },
+          "n_chunks": {
+            "type": "integer",
+            "title": "N Chunks"
+          },
+          "has_embeddings": {
+            "type": "boolean",
+            "title": "Has Embeddings",
+            "default": false
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          },
+          "activated_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Activated At"
+          },
+          "parse_warnings": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Parse Warnings"
+          },
+          "change_summary": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ChangeSummary"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "label",
+          "status",
+          "effective_from",
+          "sha256",
+          "filename",
+          "pages",
+          "n_chunks",
+          "has_embeddings",
+          "created_at",
+          "activated_at",
+          "parse_warnings",
+          "change_summary"
+        ],
+        "title": "DocumentVersion"
+      },
+      "ErrorBody": {
+        "properties": {
+          "code": {
+            "$ref": "#/components/schemas/ErrorCode"
+          },
+          "detail": {
+            "type": "string",
+            "title": "Detail"
+          },
+          "request_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Request Id"
+          }
+        },
+        "type": "object",
+        "required": [
+          "code",
+          "detail",
+          "request_id"
+        ],
+        "title": "ErrorBody"
+      },
+      "ErrorCode": {
+        "type": "string",
+        "enum": [
+          "invalid_input",
+          "not_found",
+          "conflict",
+          "unauthorized",
+          "forbidden",
+          "credentials_required",
+          "credentials_rejected",
+          "payload_too_large",
+          "rate_limited",
+          "locked_out",
+          "budget_exhausted",
+          "guardrail_blocked",
+          "unavailable",
+          "not_configured",
+          "upstream_error",
+          "internal_error"
+        ],
+        "title": "ErrorCode"
+      },
+      "EvidenceItem": {
+        "properties": {
+          "ref": {
+            "type": "string",
+            "title": "Ref"
+          },
+          "role": {
+            "$ref": "#/components/schemas/CitationRole"
+          },
+          "quote": {
+            "type": "string",
+            "title": "Quote"
+          },
+          "section": {
+            "type": "string",
+            "title": "Section"
+          },
+          "page": {
+            "type": "integer",
+            "title": "Page"
+          },
+          "passage": {
+            "type": "string",
+            "title": "Passage",
+            "description": "The full chunk the quote was found in."
+          },
+          "document_id": {
+            "type": "string",
+            "title": "Document Id"
+          },
+          "document_title": {
+            "type": "string",
+            "title": "Document Title"
+          },
+          "document_kind": {
+            "$ref": "#/components/schemas/DocKind"
+          },
+          "version_label": {
+            "type": "string",
+            "title": "Version Label"
+          },
+          "effective_from": {
+            "type": "string",
+            "format": "date",
+            "title": "Effective From"
+          },
+          "source_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Source Url"
+          }
+        },
+        "type": "object",
+        "required": [
+          "ref",
+          "role",
+          "quote",
+          "section",
+          "page",
+          "passage",
+          "document_id",
+          "document_title",
+          "document_kind",
+          "version_label",
+          "effective_from",
+          "source_url"
+        ],
+        "title": "EvidenceItem"
+      },
+      "Example": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "contract_id": {
+            "type": "string",
+            "title": "Contract Id"
+          },
+          "title": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "type": "object",
+            "title": "Title"
+          },
+          "claim": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "type": "object",
+            "title": "Claim"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "contract_id",
+          "title",
+          "claim"
+        ],
+        "title": "Example"
+      },
+      "Feedback": {
+        "properties": {
+          "rating": {
+            "$ref": "#/components/schemas/Rating"
+          },
+          "comment": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Comment"
+          },
+          "rated_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Rated At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "rating",
+          "comment",
+          "rated_at"
+        ],
+        "title": "Feedback",
+        "description": "A visitor's rating of one answer, as saved."
+      },
+      "FeedbackFilter": {
+        "type": "string",
+        "enum": [
+          "up",
+          "down",
+          "unrated"
+        ],
+        "title": "FeedbackFilter",
+        "description": "Which conversations the admin list shows, by feedback."
+      },
+      "FeedbackInput": {
+        "properties": {
+          "request_id": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9-]{8,64}$",
+            "title": "Request Id",
+            "description": "The `request_id` of the answer being rated."
+          },
+          "rating": {
+            "$ref": "#/components/schemas/Rating"
+          },
+          "comment": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 500
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Comment",
+            "description": "What went wrong or right, in the visitor's words. Personal data is masked."
+          }
+        },
+        "type": "object",
+        "required": [
+          "request_id",
+          "rating"
+        ],
+        "title": "FeedbackInput"
+      },
+      "FeedbackStats": {
+        "properties": {
+          "conversations": {
+            "type": "integer",
+            "title": "Conversations"
+          },
+          "rated": {
+            "type": "integer",
+            "title": "Rated"
+          },
+          "up": {
+            "type": "integer",
+            "title": "Up"
+          },
+          "down": {
+            "type": "integer",
+            "title": "Down"
+          },
+          "commented": {
+            "type": "integer",
+            "title": "Commented"
+          },
+          "satisfaction": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Satisfaction",
+            "description": "Share of rated answers that were liked; null until one is rated."
+          }
+        },
+        "type": "object",
+        "required": [
+          "conversations",
+          "rated",
+          "up",
+          "down",
+          "commented",
+          "satisfaction"
+        ],
+        "title": "FeedbackStats"
+      },
+      "GovernancePolicy": {
+        "properties": {
+          "tiers": {
+            "items": {
+              "$ref": "#/components/schemas/TierPolicy"
+            },
+            "type": "array",
+            "title": "Tiers"
+          },
+          "skills": {
+            "items": {
+              "$ref": "#/components/schemas/SkillPolicy"
+            },
+            "type": "array",
+            "title": "Skills"
+          },
+          "tools": {
+            "items": {
+              "$ref": "#/components/schemas/ToolPolicy"
+            },
+            "type": "array",
+            "title": "Tools"
+          },
+          "guards": {
+            "items": {
+              "$ref": "#/components/schemas/GuardPolicy"
+            },
+            "type": "array",
+            "title": "Guards"
+          },
+          "limits": {
+            "$ref": "#/components/schemas/LimitPolicy"
+          },
+          "secrets": {
+            "$ref": "#/components/schemas/SecretsPosture"
+          }
+        },
+        "type": "object",
+        "required": [
+          "tiers",
+          "skills",
+          "tools",
+          "guards",
+          "limits",
+          "secrets"
+        ],
+        "title": "GovernancePolicy"
+      },
+      "GovernanceSummary": {
+        "properties": {
+          "window_hours": {
+            "type": "integer",
+            "title": "Window Hours"
+          },
+          "generated_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Generated At"
+          },
+          "requests": {
+            "type": "integer",
+            "title": "Requests"
+          },
+          "by_outcome": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "type": "object",
+            "title": "By Outcome"
+          },
+          "by_intent": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "type": "object",
+            "title": "By Intent"
+          },
+          "by_verdict": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "type": "object",
+            "title": "By Verdict"
+          },
+          "by_confidence": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "type": "object",
+            "title": "By Confidence"
+          },
+          "by_model": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "type": "object",
+            "title": "By Model"
+          },
+          "tools": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "type": "object",
+            "title": "Tools"
+          },
+          "guard_flags": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "type": "object",
+            "title": "Guard Flags"
+          },
+          "tokens": {
+            "$ref": "#/components/schemas/TokenTotals"
+          },
+          "latency": {
+            "$ref": "#/components/schemas/LatencyStats"
+          },
+          "citations": {
+            "$ref": "#/components/schemas/CitationStats"
+          },
+          "abuse": {
+            "$ref": "#/components/schemas/AbuseStats"
+          },
+          "budgets": {
+            "$ref": "#/components/schemas/BudgetStatus"
+          },
+          "breaker": {
+            "$ref": "#/components/schemas/BreakerStatus"
+          }
+        },
+        "type": "object",
+        "required": [
+          "window_hours",
+          "generated_at",
+          "requests",
+          "by_outcome",
+          "by_intent",
+          "by_verdict",
+          "by_confidence",
+          "by_model",
+          "tools",
+          "guard_flags",
+          "tokens",
+          "latency",
+          "citations",
+          "abuse",
+          "budgets",
+          "breaker"
+        ],
+        "title": "GovernanceSummary"
+      },
+      "GuardCode": {
+        "type": "string",
+        "enum": [
+          "empty",
+          "too_long",
+          "control_chars",
+          "pii_redacted",
+          "injection_pattern",
+          "attack_intent",
+          "prompt_leak",
+          "output_sanitized",
+          "citation_dropped",
+          "verdict_downgraded"
+        ],
+        "title": "GuardCode"
+      },
+      "GuardName": {
+        "type": "string",
+        "enum": [
+          "text_normalizer",
+          "pii_redactor",
+          "injection_detector",
+          "intent_classifier",
+          "prompt_leak_canary",
+          "output_sanitizer",
+          "citation_verifier"
+        ],
+        "title": "GuardName"
+      },
+      "GuardPolicy": {
+        "properties": {
+          "name": {
+            "$ref": "#/components/schemas/GuardName"
+          },
+          "stage": {
+            "$ref": "#/components/schemas/GuardStage"
+          },
+          "description": {
+            "type": "string",
+            "title": "Description"
+          }
+        },
+        "type": "object",
+        "required": [
+          "name",
+          "stage",
+          "description"
+        ],
+        "title": "GuardPolicy"
+      },
+      "GuardStage": {
+        "type": "string",
+        "enum": [
+          "input",
+          "output"
+        ],
+        "title": "GuardStage"
+      },
+      "HTTPValidationError": {
+        "properties": {
+          "detail": {
+            "items": {
+              "$ref": "#/components/schemas/ValidationError"
+            },
+            "type": "array",
+            "title": "Detail"
+          }
+        },
+        "type": "object",
+        "title": "HTTPValidationError"
+      },
+      "Health": {
+        "properties": {
+          "status": {
+            "$ref": "#/components/schemas/HealthStatus"
+          },
+          "version": {
+            "type": "string",
+            "title": "Version"
+          }
+        },
+        "type": "object",
+        "required": [
+          "status",
+          "version"
+        ],
+        "title": "Health"
+      },
+      "HealthStatus": {
+        "type": "string",
+        "enum": [
+          "ok"
+        ],
+        "title": "HealthStatus"
+      },
+      "Intent": {
+        "type": "string",
+        "enum": [
+          "claim",
+          "smalltalk",
+          "off_topic",
+          "attack"
+        ],
+        "title": "Intent"
+      },
+      "Language": {
+        "type": "string",
+        "enum": [
+          "en",
+          "fr"
+        ],
+        "title": "Language"
+      },
+      "LatencyStats": {
+        "properties": {
+          "average_ms": {
+            "type": "integer",
+            "title": "Average Ms"
+          },
+          "p95_ms": {
+            "type": "integer",
+            "title": "P95 Ms"
+          }
+        },
+        "type": "object",
+        "required": [
+          "average_ms",
+          "p95_ms"
+        ],
+        "title": "LatencyStats"
+      },
+      "LimitPolicy": {
+        "properties": {
+          "rate_per_minute": {
+            "type": "integer",
+            "title": "Rate Per Minute"
+          },
+          "client_daily_tokens": {
+            "type": "integer",
+            "title": "Client Daily Tokens"
+          },
+          "global_daily_tokens": {
+            "type": "integer",
+            "title": "Global Daily Tokens"
+          },
+          "strike_limit": {
+            "type": "integer",
+            "title": "Strike Limit"
+          },
+          "strike_window_s": {
+            "type": "number",
+            "title": "Strike Window S"
+          },
+          "lockout_s": {
+            "type": "number",
+            "title": "Lockout S"
+          },
+          "max_claim_chars": {
+            "type": "integer",
+            "title": "Max Claim Chars"
+          },
+          "llm_retry_attempts": {
+            "type": "integer",
+            "title": "Llm Retry Attempts"
+          },
+          "breaker_failure_threshold": {
+            "type": "integer",
+            "title": "Breaker Failure Threshold"
+          },
+          "breaker_reset_s": {
+            "type": "number",
+            "title": "Breaker Reset S"
+          },
+          "llm_max_concurrency": {
+            "type": "integer",
+            "title": "Llm Max Concurrency"
+          },
+          "agent_max_steps": {
+            "type": "integer",
+            "title": "Agent Max Steps"
+          },
+          "agent_deadline_s": {
+            "type": "number",
+            "title": "Agent Deadline S"
+          }
+        },
+        "type": "object",
+        "required": [
+          "rate_per_minute",
+          "client_daily_tokens",
+          "global_daily_tokens",
+          "strike_limit",
+          "strike_window_s",
+          "lockout_s",
+          "max_claim_chars",
+          "llm_retry_attempts",
+          "breaker_failure_threshold",
+          "breaker_reset_s",
+          "llm_max_concurrency",
+          "agent_max_steps",
+          "agent_deadline_s"
+        ],
+        "title": "LimitPolicy"
+      },
+      "ModelTier": {
+        "type": "string",
+        "enum": [
+          "fast",
+          "reasoning"
+        ],
+        "title": "ModelTier",
+        "description": "FAST: small, cheap model for routing and small talk. REASONING: the thinking model."
+      },
+      "OpenAiAuth": {
+        "type": "string",
+        "enum": [
+          "api_key",
+          "managed_identity"
+        ],
+        "title": "OpenAiAuth"
+      },
+      "Outcome": {
+        "type": "string",
+        "enum": [
+          "answered",
+          "replied",
+          "blocked",
+          "rate_limited",
+          "locked_out",
+          "budget_exhausted",
+          "error"
+        ],
+        "title": "Outcome"
+      },
+      "Rating": {
+        "type": "string",
+        "enum": [
+          "up",
+          "down"
+        ],
+        "title": "Rating",
+        "description": "A visitor's verdict on one answer."
+      },
+      "Readiness": {
+        "properties": {
+          "ready": {
+            "type": "boolean",
+            "title": "Ready"
+          },
+          "contracts": {
+            "type": "integer",
+            "title": "Contracts"
+          },
+          "live_versions": {
+            "type": "integer",
+            "title": "Live Versions"
+          },
+          "llm_configured": {
+            "type": "boolean",
+            "title": "Llm Configured"
+          },
+          "embeddings_configured": {
+            "type": "boolean",
+            "title": "Embeddings Configured"
+          },
+          "byo_enabled": {
+            "type": "boolean",
+            "title": "Byo Enabled"
+          }
+        },
+        "type": "object",
+        "required": [
+          "ready",
+          "contracts",
+          "live_versions",
+          "llm_configured",
+          "embeddings_configured",
+          "byo_enabled"
+        ],
+        "title": "Readiness"
+      },
+      "ReasoningEffort": {
+        "type": "string",
+        "enum": [
+          "low",
+          "medium",
+          "high"
+        ],
+        "title": "ReasoningEffort"
+      },
+      "ReplyResponse": {
+        "properties": {
+          "kind": {
+            "type": "string",
+            "const": "reply",
+            "title": "Kind",
+            "default": "reply"
+          },
+          "request_id": {
+            "type": "string",
+            "title": "Request Id"
+          },
+          "generated_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Generated At",
+            "description": "When the answer was produced (UTC)."
+          },
+          "intent": {
+            "$ref": "#/components/schemas/Intent"
+          },
+          "language": {
+            "$ref": "#/components/schemas/Language"
+          },
+          "text": {
+            "type": "string",
+            "title": "Text"
+          },
+          "model": {
+            "type": "string",
+            "title": "Model"
+          },
+          "latency_ms": {
+            "type": "integer",
+            "title": "Latency Ms"
+          }
+        },
+        "type": "object",
+        "required": [
+          "kind",
+          "request_id",
+          "generated_at",
+          "intent",
+          "language",
+          "text",
+          "model",
+          "latency_ms"
+        ],
+        "title": "ReplyResponse",
+        "description": "A short answer to a greeting or an off-topic message, produced by the small model."
+      },
+      "ResponseKind": {
+        "type": "string",
+        "enum": [
+          "assessment",
+          "reply"
+        ],
+        "title": "ResponseKind"
+      },
+      "RetrievalInfo": {
+        "properties": {
+          "mode": {
+            "$ref": "#/components/schemas/RetrievalMode"
+          },
+          "passages_reviewed": {
+            "type": "integer",
+            "title": "Passages Reviewed"
+          },
+          "passages_total": {
+            "type": "integer",
+            "title": "Passages Total"
+          }
+        },
+        "type": "object",
+        "required": [
+          "mode",
+          "passages_reviewed",
+          "passages_total"
+        ],
+        "title": "RetrievalInfo"
+      },
+      "RetrievalMode": {
+        "type": "string",
+        "enum": [
+          "full_context",
+          "hybrid",
+          "keyword"
+        ],
+        "title": "RetrievalMode"
+      },
+      "SecretsPosture": {
+        "properties": {
+          "admin_token_hashed": {
+            "type": "boolean",
+            "title": "Admin Token Hashed"
+          },
+          "openai_auth": {
+            "$ref": "#/components/schemas/OpenAiAuth"
+          },
+          "log_redaction": {
+            "type": "boolean",
+            "title": "Log Redaction"
+          },
+          "client_addresses_pseudonymised": {
+            "type": "boolean",
+            "title": "Client Addresses Pseudonymised"
+          }
+        },
+        "type": "object",
+        "required": [
+          "admin_token_hashed",
+          "openai_auth",
+          "log_redaction",
+          "client_addresses_pseudonymised"
+        ],
+        "title": "SecretsPosture"
+      },
+      "SessionStatus": {
+        "properties": {
+          "source": {
+            "$ref": "#/components/schemas/CredentialSource"
+          },
+          "endpoint_host": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Endpoint Host"
+          },
+          "reasoning_deployment": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reasoning Deployment"
+          },
+          "fast_deployment": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Fast Deployment"
+          },
+          "expires_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Expires At"
+          },
+          "byo_allowed": {
+            "type": "boolean",
+            "title": "Byo Allowed"
+          }
+        },
+        "type": "object",
+        "required": [
+          "source",
+          "endpoint_host",
+          "reasoning_deployment",
+          "fast_deployment",
+          "expires_at",
+          "byo_allowed"
+        ],
+        "title": "SessionStatus"
+      },
+      "SkillName": {
+        "type": "string",
+        "enum": [
+          "concierge",
+          "query_rewrite",
+          "coverage"
+        ],
+        "title": "SkillName"
+      },
+      "SkillPolicy": {
+        "properties": {
+          "name": {
+            "$ref": "#/components/schemas/SkillName"
+          },
+          "version": {
+            "type": "string",
+            "title": "Version"
+          },
+          "tier": {
+            "$ref": "#/components/schemas/ModelTier"
+          },
+          "tools": {
+            "items": {
+              "$ref": "#/components/schemas/ToolName"
+            },
+            "type": "array",
+            "title": "Tools"
+          },
+          "max_steps": {
+            "type": "integer",
+            "title": "Max Steps"
+          }
+        },
+        "type": "object",
+        "required": [
+          "name",
+          "version",
+          "tier",
+          "tools",
+          "max_steps"
+        ],
+        "title": "SkillPolicy"
+      },
+      "TierPolicy": {
+        "properties": {
+          "tier": {
+            "$ref": "#/components/schemas/ModelTier"
+          },
+          "deployment": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Deployment"
+          },
+          "max_output_tokens": {
+            "type": "integer",
+            "title": "Max Output Tokens"
+          },
+          "timeout_s": {
+            "type": "number",
+            "title": "Timeout S"
+          },
+          "reasoning_effort": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ReasoningEffort"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "type": "object",
+        "required": [
+          "tier",
+          "deployment",
+          "max_output_tokens",
+          "timeout_s",
+          "reasoning_effort"
+        ],
+        "title": "TierPolicy"
+      },
+      "TokenTotals": {
+        "properties": {
+          "prompt": {
+            "type": "integer",
+            "title": "Prompt"
+          },
+          "completion": {
+            "type": "integer",
+            "title": "Completion"
+          },
+          "by_tier": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "type": "object",
+            "title": "By Tier"
+          }
+        },
+        "type": "object",
+        "required": [
+          "prompt",
+          "completion",
+          "by_tier"
+        ],
+        "title": "TokenTotals"
+      },
+      "ToolName": {
+        "type": "string",
+        "enum": [
+          "list_sections",
+          "search_policy",
+          "read_section"
+        ],
+        "title": "ToolName"
+      },
+      "ToolPolicy": {
+        "properties": {
+          "name": {
+            "$ref": "#/components/schemas/ToolName"
+          },
+          "description": {
+            "type": "string",
+            "title": "Description"
+          }
+        },
+        "type": "object",
+        "required": [
+          "name",
+          "description"
+        ],
+        "title": "ToolPolicy"
+      },
+      "ValidationError": {
+        "properties": {
+          "loc": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ]
+            },
+            "type": "array",
+            "title": "Location"
+          },
+          "msg": {
+            "type": "string",
+            "title": "Message"
+          },
+          "type": {
+            "type": "string",
+            "title": "Error Type"
+          },
+          "input": {
+            "title": "Input"
+          },
+          "ctx": {
+            "type": "object",
+            "title": "Context"
+          }
+        },
+        "type": "object",
+        "required": [
+          "loc",
+          "msg",
+          "type"
+        ],
+        "title": "ValidationError"
+      },
+      "Verdict": {
+        "type": "string",
+        "enum": [
+          "covered",
+          "not_covered",
+          "ambiguous",
+          "needs_more_info",
+          "out_of_scope"
+        ],
+        "title": "Verdict"
+      },
+      "VersionPublic": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "label": {
+            "type": "string",
+            "title": "Label"
+          },
+          "effective_from": {
+            "type": "string",
+            "format": "date",
+            "title": "Effective From"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "label",
+          "effective_from"
+        ],
+        "title": "VersionPublic"
+      },
+      "VersionStatus": {
+        "type": "string",
+        "enum": [
+          "draft",
+          "live",
+          "withdrawn"
+        ],
+        "title": "VersionStatus"
+      }
+    }
+  }
+}

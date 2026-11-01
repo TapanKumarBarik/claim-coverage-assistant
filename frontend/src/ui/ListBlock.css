@@ -1,0 +1,4 @@
+.list-block { margin-top: 1rem; }
+.list-block--compact { margin-top: 0.5rem; }
+.list-block ul { margin-bottom: 0; }
+.list-block--compact .label { margin-bottom: 0.15rem; }

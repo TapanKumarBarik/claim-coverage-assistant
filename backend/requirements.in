@@ -1,0 +1,14 @@
+# Runtime dependencies (direct). Pinned, Linux-resolved lock: requirements.txt
+#   uv pip compile requirements.in -o requirements.txt --python-version 3.13 --python-platform linux
+fastapi
+uvicorn[standard]
+gunicorn
+pydantic-settings
+openai
+azure-identity
+numpy
+rank-bm25
+pyyaml
+python-multipart
+pdfplumber
+httpx

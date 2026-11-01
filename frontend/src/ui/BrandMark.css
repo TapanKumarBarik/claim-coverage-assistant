@@ -1,0 +1,2 @@
+.brand-mark { flex: none; display: inline-grid; place-items: center; width: 2.1rem; height: 2.1rem; border-radius: 0.55rem; background: var(--accent); color: var(--accent-fg); }
+.brand-mark--large { width: 3.4rem; height: 3.4rem; border-radius: 0.9rem; }

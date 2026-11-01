@@ -1,0 +1,11 @@
+.conversations__privacy { margin: 0; font-size: 0.9rem; }
+.conversation-filters { display: flex; flex-wrap: wrap; align-items: end; gap: 0 1rem; }
+.conversation-filters .field:last-child { flex: 1 1 18rem; }
+.conversation-link { max-width: 34rem; text-align: left; text-decoration: none; font-weight: 500; color: var(--text); overflow-wrap: anywhere; }
+.conversation-link:hover:not(:disabled) { color: var(--accent); text-decoration: underline; }
+.conversation-confidence { display: block; margin-top: 0.2rem; }
+.rating-pill { display: inline-flex; align-items: center; gap: 0.4rem; }
+.rating-pill .pill { display: inline-flex; align-items: center; gap: 0.25rem; }
+.rating-pill__comment { display: inline-grid; color: var(--muted); }
+.conversation-question { margin: 0; padding: 0.8rem 1rem; background: var(--surface-2); border-radius: 12px; white-space: pre-wrap; overflow-wrap: anywhere; }
+.conversation-comment { margin: 0; padding: 0.7rem 1rem; border-left: 3px solid var(--danger); border-radius: 0 12px 12px 0; background: var(--surface-2); white-space: pre-wrap; overflow-wrap: anywhere; }

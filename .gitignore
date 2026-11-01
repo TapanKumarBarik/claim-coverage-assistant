@@ -1,0 +1,37 @@
+# Python
+.venv/
+__pycache__/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Secrets and local state. Only the documented template is committed.
+.env
+.env.*
+!.env.example
+*.env.local
+*.pem
+*.key
+*.pfx
+*.p12
+local.settings.json
+.azure/
+.claude/
+*.sqlite3
+*.db
+*.log
+backend/data/storage/
+
+# Third-party policy PDFs are fetched, not committed (see backend/scripts/fetch_sources.py)
+backend/data/raw/
+backend/data/text/
+
+# Frontend
+node_modules/
+frontend/dist/
+backend/app/static/
+
+# Editors / OS
+.vscode/
+.DS_Store
+Thumbs.db

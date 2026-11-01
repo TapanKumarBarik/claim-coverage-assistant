@@ -1,0 +1,23 @@
+.skip-link { position: absolute; left: -999px; top: 0; background: var(--accent); color: var(--accent-fg); padding: 0.5rem 1rem; z-index: 10; }
+.skip-link:focus { left: 0; }
+
+.site-header { position: sticky; top: 0; z-index: 5; background: var(--surface); border-bottom: 1px solid var(--border); }
+.site-header__inner { max-width: 1180px; min-height: var(--header-h); margin: 0 auto; padding: 0.5rem 1rem; display: flex; gap: 0.5rem 1rem; flex-wrap: wrap; justify-content: space-between; align-items: center; }
+.brand { display: flex; align-items: center; gap: 0.65rem; }
+.site-header h1 { margin: 0; font-size: 1.05rem; letter-spacing: -0.01em; }
+.site-header__controls { display: flex; gap: 0.75rem; align-items: center; flex-wrap: wrap; }
+
+.main-nav { display: flex; gap: 0.25rem; }
+.main-nav a { text-decoration: none; padding: 0.3rem 0.75rem; border-radius: 999px; color: var(--muted); }
+.main-nav a:hover { background: var(--surface-2); color: var(--text); }
+.main-nav a[aria-current="page"] { background: var(--accent-soft); color: var(--accent-soft-fg); font-weight: 600; }
+
+.language-switch { display: inline-flex; border: 1px solid var(--border); border-radius: 999px; overflow: hidden; }
+.language-switch button { font: inherit; font-size: 0.85rem; cursor: pointer; border: 0; border-radius: 0; background: transparent; color: var(--text); padding: 0.25rem 0.65rem; font-weight: 600; }
+.language-switch button:hover { background: var(--surface-2); }
+.language-switch button[aria-pressed="true"] { background: var(--accent); color: var(--accent-fg); }
+
+.container:focus { outline: none; }
+/* The chat fills the space under the header with the message box at the very bottom. The page colour shows on both
+   sides of the column, so on a wide screen the margins read as a frame around the conversation, not as blank space. */
+.container.container--chat { display: flex; flex-direction: column; max-width: none; min-height: calc(100dvh - var(--header-h)); padding: 0; background: var(--bg); }
