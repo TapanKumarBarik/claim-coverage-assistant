@@ -45,7 +45,7 @@ jobs:
         working-directory: backend
         run: zip -r ../app.zip . -x ".venv/*" "tests/*" "data/storage/*" "data/text/*" ".*cache/*" "*/__pycache__/*" ".env"
 
-      - uses: azure/login@v2
+      - uses: azure/login@v3
         with:
           client-id: ${{ vars.AZURE_CLIENT_ID }}
           tenant-id: ${{ vars.AZURE_TENANT_ID }}
