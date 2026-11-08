@@ -166,10 +166,11 @@ pydantic-settings==2.16.2
     #   -r requirements.in
 pygments==2.21.0
     # via pytest
-pyjwt==2.15.1
+pyjwt[crypto]==2.15.1
     # via
     #   -c requirements.txt
     #   msal
+    #   pyjwt
 pypdfium2==5.14.0
     # via
     #   -c requirements.txt
@@ -178,7 +179,7 @@ pytest==9.2.0
     # via
     #   -r requirements-dev.in
     #   pytest-asyncio
-pytest-asyncio==1.4.1
+pytest-asyncio==1.4.1.post1
     # via -r requirements-dev.in
 python-dotenv==1.2.4
     # via
@@ -227,12 +228,15 @@ typing-extensions==4.16.0
     #   azure-core
     #   azure-identity
     #   fastapi
+    #   httpx2
     #   mypy
     #   openai
     #   opentelemetry-api
     #   pydantic
     #   pydantic-core
     #   pydantic-settings
+    #   pytest-asyncio
+    #   starlette
     #   typing-inspection
 typing-inspection==0.4.4
     # via
@@ -244,7 +248,7 @@ urllib3==2.8.0
     # via
     #   -c requirements.txt
     #   requests
-uvicorn==0.54.0
+uvicorn[standard]==0.54.0
     # via
     #   -c requirements.txt
     #   -r requirements.in
